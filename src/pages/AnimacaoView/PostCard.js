@@ -1,5 +1,5 @@
 import { AspectRatio, Box, Center, Heading, HStack, Image, Stack, Text } from 'native-base';
-import React from 'react';
+import React, { memo } from 'react';
 import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -97,4 +97,12 @@ PostCard.propTypes = {
   navigation: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
-export default PostCard;
+const equal = (prevProps, nextProps) => {
+  if (nextProps.id !== prevProps.id) {
+    return false;
+  }
+
+  return true;
+};
+
+export default memo(PostCard, equal);
