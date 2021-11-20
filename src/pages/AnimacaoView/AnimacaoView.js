@@ -1,25 +1,28 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Center, FlatList, Heading, HStack, Spinner, View } from 'native-base';
+import { FlatList, View } from 'native-base';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { PostsSelector, retornaPostsAsync } from '../../redux/PostsSlice';
 import PostCard from './PostCard';
-
-const Carregando = () => (
-  <Center flex={1}>
-    <HStack space={2} alignItems="center">
-      <Spinner accessibilityLabel="Loading posts" />
-      <Heading color="primary.500" fontSize="md">
-        Carregando
-      </Heading>
-    </HStack>
-  </Center>
-);
+import Carregando from './Carregando';
+import Detalhe from './Detalhe';
 
 const AnimacaoView = ({ navigation }) => {
   const dispatch = useDispatch();
   const { postagems, status } = useSelector(PostsSelector);
+
+  const [modalVisible, setModalVisible] = useState({
+    visible: false,
+    id: '',
+    IMAGE: '',
+  });
+
+  // console.log(modalVisible);
+
+  const AbriModal = (valor) => {
+    setModalVisible(valor);
+  };
 
   const BuscaPosts = useCallback(() => {
     dispatch(retornaPostsAsync());
@@ -30,7 +33,7 @@ const AnimacaoView = ({ navigation }) => {
   }, [BuscaPosts]);
 
   const RenderItem = useCallback(
-    ({ item }) => <PostCard navigation={navigation} item={item} />,
+    ({ item }) => <PostCard navigation={navigation} item={item} AbriModal={AbriModal} />,
     [navigation],
   );
   const Extractor = useCallback((item) => item.id.toString(), []);
@@ -42,14 +45,22 @@ const AnimacaoView = ({ navigation }) => {
   }
 
   if (status === 'sucesso') {
-    Content = <FlatList data={postagems} keyExtractor={Extractor} renderItem={RenderItem} />;
+    Content = (
+      <>
+        <FlatList
+          data={postagems}
+          keyExtractor={Extractor}
+          renderItem={RenderItem}
+          // contentContainerStyle={{
+          //   flexGrow: 1,
+          // }}
+        />
+        {modalVisible.visible && <Detalhe {...modalVisible} AbriModal={AbriModal} />}
+      </>
+    );
   }
 
-  return (
-    <View flex={1} bg="amber.100">
-      {Content}
-    </View>
-  );
+  return <View flex={1}>{Content}</View>;
 };
 
 AnimacaoView.propTypes = {

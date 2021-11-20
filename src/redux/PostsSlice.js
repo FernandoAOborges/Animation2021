@@ -12,10 +12,23 @@ export const retornaPostsAsync = createAsyncThunk(
   },
 );
 
+export const retornaComentariosAsync = createAsyncThunk(
+  'posts/retornaComentariosAsync',
+  async (payload, thunkAPI) => {
+    const response = await fetch('https://jsonplaceholder.typicode.com/comments');
+    const json = await response.json();
+    if (response.ok) {
+      return json;
+    }
+    return thunkAPI.rejectWithValue(json);
+  },
+);
+
 const initialState = {
   status: 'idle',
   erroPosts: '',
   postagems: [],
+  comentarios: [],
 };
 
 export const PostsSlice = createSlice({
@@ -42,6 +55,7 @@ export const PostsSelector = createSelector(
   (state) => ({
     status: state.posts.status,
     postagems: state.posts.postagems,
+    comentarios: state.posts.comentarios,
   }),
   (state) => state,
 );
